@@ -36,6 +36,9 @@ target_include_directories(DDAEngine
     PRIVATE "${CMAKE_SOURCE_DIR}/includes"
 )
 
+# Define export macro for Windows DLL
+target_compile_definitions(DDAEngine PRIVATE DDA_ENGINE_EXPORTS)
+
 
 
 # === Native test app with main() ===
@@ -48,6 +51,9 @@ target_include_directories(DDAEngineTest
     PRIVATE "${CMAKE_SOURCE_DIR}/src"
     PRIVATE "${CMAKE_SOURCE_DIR}/includes"
 )
+
+# Define export macro for test executable too since it compiles the sources directly
+target_compile_definitions(DDAEngineTest PRIVATE DDA_ENGINE_EXPORTS)
 
 # Link ALL_LIBS if needed later (won’t fail if not linked)
 target_link_libraries(DDAEngine

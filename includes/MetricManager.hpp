@@ -5,6 +5,8 @@
 #include <vector>
 #include <stdexcept>
 #include <unordered_map>
+#include <optional>
+#include <variant>
 
 #include "Metric.hpp"
 #include "MetricData.hpp"
@@ -31,6 +33,16 @@ public:
 	template <typename T>
 	MetricData<T>& getMetricData(const std::string& name) const;
 
+	void addMetric(const std::string& name, DDAMetricType type);
+	
+	template <typename T>
+	void pushMetric(const std::string& name, T value);
+	
+	std::optional<std::variant<int, double>> getComputedValue(const std::string& name) const;
+	
+	size_t getMetricCount(const std::string& name) const;
+	
+	void clearAll();
 
 	void RemoveMetric(const std::string& name);
 
@@ -63,6 +75,29 @@ MetricData<T>& MetricManager::getMetricData(const std::string& name) const
 	else
 	{
 		throw std::runtime_error("Metric not found or type mismatch: " + name);
+	}
+}
+
+template <typename T>
+void MetricManager::pushMetric(const std::string& name, T value)
+{
+	auto it = metrics.find(name);
+	if (it != metrics.end())
+	{
+		MetricData<T>* metricData = dynamic_cast<MetricData<T>*>(it->second.get());
+		if (metricData)
+		{
+			metricData->dataStore.addData(value);
+			metricData->value = value;
+		}
+		else
+		{
+			throw std::runtime_error("Metric type mismatch for: " + name);
+		}
+	}
+	else
+	{
+		throw std::runtime_error("Metric not found: " + name);
 	}
 }
 
