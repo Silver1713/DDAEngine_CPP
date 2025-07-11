@@ -187,6 +187,20 @@
       ]
     },
     {
+      "name": "Global",
+      "description": "Global DDA parameters",
+      "parameters": [
+        {
+          "name": "difficultyMultiplier",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.1,
+          "maxValue": 3.0,
+          "description": "Overall difficulty multiplier"
+        }
+      ]
+    },
+    {
       "name": "Economy",
       "description": "Game economy and progression parameters",
       "parameters": [

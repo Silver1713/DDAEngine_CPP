@@ -6,8 +6,15 @@
 
 std::unique_ptr<DDAEngine> DDAEngine::instance = nullptr;
 
-DDAEngine::DDAEngine() : metricManager(*MetricManager::getInstance()), 
-                         geneticAlgorithm(50, 5, 0.1f, 0.7f) {
+DDAEngine::DDAEngine() : metricManager(*MetricManager::getInstance()) {
+    // Initialize GA with default configuration
+    GAConfig gaConfig;
+    gaConfig.populationSize = 50;
+    gaConfig.eliteSize = 5;
+    gaConfig.mutationRate = 0.1f;
+    gaConfig.crossoverRate = 0.7f;
+    geneticAlgorithm.setConfig(gaConfig);
+    
     lastEvolutionTime = std::chrono::steady_clock::now();
 }
 
@@ -153,10 +160,12 @@ float DDAEngine::calculateFitness(const DDAParameters& params, const MetricManag
     fitness += difficultyBalance;
     
     float parameterPenalty = 0.0f;
-    if (params.ai.aggressiveness > 0.9f || params.ai.aggressiveness < 0.1f) {
+    float aggressiveness = params.getValue<float>("AI.aggressiveness", 0.5f);
+    float enemyDensity = params.getValue<float>("PCG.enemyDensity", 0.5f);
+    if (aggressiveness > 0.9f || aggressiveness < 0.1f) {
         parameterPenalty += 5.0f;
     }
-    if (params.pcg.enemyDensity > 0.9f || params.pcg.enemyDensity < 0.1f) {
+    if (enemyDensity > 0.9f || enemyDensity < 0.1f) {
         parameterPenalty += 5.0f;
     }
     fitness -= parameterPenalty;
@@ -199,32 +208,8 @@ void DDAEngine::smoothParameterTransition(float deltaTime) {
         return a + (b - a) * t;
     };
     
-    currentParameters.ai.aggressiveness = lerp(currentParameters.ai.aggressiveness, 
-                                               targetParameters.ai.aggressiveness, t);
-    currentParameters.ai.reactionTime = lerp(currentParameters.ai.reactionTime, 
-                                            targetParameters.ai.reactionTime, t);
-    currentParameters.ai.accuracy = lerp(currentParameters.ai.accuracy, 
-                                        targetParameters.ai.accuracy, t);
-    currentParameters.ai.movementSpeed = lerp(currentParameters.ai.movementSpeed, 
-                                             targetParameters.ai.movementSpeed, t);
-    currentParameters.ai.detectionRange = lerp(currentParameters.ai.detectionRange, 
-                                              targetParameters.ai.detectionRange, t);
-    currentParameters.ai.attackFrequency = lerp(currentParameters.ai.attackFrequency, 
-                                               targetParameters.ai.attackFrequency, t);
-    
-    currentParameters.pcg.enemyDensity = lerp(currentParameters.pcg.enemyDensity, 
-                                             targetParameters.pcg.enemyDensity, t);
-    currentParameters.pcg.powerUpFrequency = lerp(currentParameters.pcg.powerUpFrequency, 
-                                                 targetParameters.pcg.powerUpFrequency, t);
-    currentParameters.pcg.obstacleComplexity = lerp(currentParameters.pcg.obstacleComplexity, 
-                                                   targetParameters.pcg.obstacleComplexity, t);
-    currentParameters.pcg.pathBranching = lerp(currentParameters.pcg.pathBranching, 
-                                              targetParameters.pcg.pathBranching, t);
-    currentParameters.pcg.hazardIntensity = lerp(currentParameters.pcg.hazardIntensity, 
-                                                targetParameters.pcg.hazardIntensity, t);
-    
-    currentParameters.difficultyMultiplier = lerp(currentParameters.difficultyMultiplier, 
-                                                 targetParameters.difficultyMultiplier, t);
+    // Use the new interpolation method from DDAParameters
+    currentParameters = DDAParameters::interpolate(currentParameters, targetParameters, t);
     
     currentParameters.clamp();
 }
@@ -277,13 +262,13 @@ float DDAEngine::calculatePlayerSkillLevel() const {
 nlohmann::json DDAEngine::getLevelGenerationHints() const {
     nlohmann::json hints;
     
-    hints["enemy_spawn_rate"] = currentParameters.pcg.enemyDensity;
-    hints["min_enemies_per_room"] = currentParameters.pcg.minEnemiesPerRoom;
-    hints["max_enemies_per_room"] = currentParameters.pcg.maxEnemiesPerRoom;
-    hints["powerup_frequency"] = currentParameters.pcg.powerUpFrequency;
-    hints["obstacle_complexity"] = currentParameters.pcg.obstacleComplexity;
-    hints["path_branching"] = currentParameters.pcg.pathBranching;
-    hints["hazard_intensity"] = currentParameters.pcg.hazardIntensity;
+    hints["enemy_spawn_rate"] = currentParameters.getValue<float>("PCG.enemyDensity", 0.5f);
+    hints["min_enemies_per_room"] = currentParameters.getValue<int>("PCG.minEnemiesPerRoom", 1);
+    hints["max_enemies_per_room"] = currentParameters.getValue<int>("PCG.maxEnemiesPerRoom", 5);
+    hints["powerup_frequency"] = currentParameters.getValue<float>("PCG.powerUpFrequency", 0.3f);
+    hints["obstacle_complexity"] = currentParameters.getValue<float>("PCG.obstacleComplexity", 0.5f);
+    hints["path_branching"] = currentParameters.getValue<float>("PCG.pathBranching", 0.4f);
+    hints["hazard_intensity"] = currentParameters.getValue<float>("PCG.hazardIntensity", 0.3f);
     
     float skillLevel = calculatePlayerSkillLevel();
     hints["recommended_difficulty"] = skillLevel;

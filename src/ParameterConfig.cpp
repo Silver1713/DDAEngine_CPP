@@ -337,8 +337,18 @@ ParameterConfig ParameterConfig::createDefaultConfig() {
         {"maxEnemiesPerRoom", "int", 5, 1, 20, "Maximum enemies per room"}
     };
     
+    // Global Parameters Group
+    ParameterGroup globalGroup;
+    globalGroup.name = "Global";
+    globalGroup.description = "Global DDA parameters";
+    
+    globalGroup.parameters = {
+        {"difficultyMultiplier", "float", 1.0f, 0.1f, 3.0f, "Overall difficulty multiplier"}
+    };
+    
     config.addParameterGroup(aiGroup);
     config.addParameterGroup(pcgGroup);
+    config.addParameterGroup(globalGroup);
     
     // Default fitness configuration
     FitnessConfig fitnessConfig;

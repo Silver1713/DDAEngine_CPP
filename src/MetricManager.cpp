@@ -1,6 +1,5 @@
-#pragma once
 #include "MetricManager.hpp"
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <variant>
 MetricManager* MetricManager::instance = nullptr;

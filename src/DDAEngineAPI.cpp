@@ -46,30 +46,33 @@ DDA_API void DDA_EvolveParameters() {
 DDA_API void DDA_GetAIParameters(AIParametersC* outParams) {
     if (outParams) {
         auto params = DDAEngine::getInstance().getCurrentParameters();
-        outParams->aggressiveness = params.ai.aggressiveness;
-        outParams->reactionTime = params.ai.reactionTime;
-        outParams->accuracy = params.ai.accuracy;
-        outParams->movementSpeed = params.ai.movementSpeed;
-        outParams->detectionRange = params.ai.detectionRange;
-        outParams->attackFrequency = params.ai.attackFrequency;
+        auto aiParams = params.getAIParameters();
+        outParams->aggressiveness = aiParams.aggressiveness;
+        outParams->reactionTime = aiParams.reactionTime;
+        outParams->accuracy = aiParams.accuracy;
+        outParams->movementSpeed = aiParams.movementSpeed;
+        outParams->detectionRange = aiParams.detectionRange;
+        outParams->attackFrequency = aiParams.attackFrequency;
     }
 }
 
 DDA_API void DDA_GetPCGParameters(PCGParametersC* outParams) {
     if (outParams) {
         auto params = DDAEngine::getInstance().getCurrentParameters();
-        outParams->enemyDensity = params.pcg.enemyDensity;
-        outParams->powerUpFrequency = params.pcg.powerUpFrequency;
-        outParams->obstacleComplexity = params.pcg.obstacleComplexity;
-        outParams->pathBranching = params.pcg.pathBranching;
-        outParams->hazardIntensity = params.pcg.hazardIntensity;
-        outParams->minEnemiesPerRoom = params.pcg.minEnemiesPerRoom;
-        outParams->maxEnemiesPerRoom = params.pcg.maxEnemiesPerRoom;
+        auto pcgParams = params.getPCGParameters();
+        outParams->enemyDensity = pcgParams.enemyDensity;
+        outParams->powerUpFrequency = pcgParams.powerUpFrequency;
+        outParams->obstacleComplexity = pcgParams.obstacleComplexity;
+        outParams->pathBranching = pcgParams.pathBranching;
+        outParams->hazardIntensity = pcgParams.hazardIntensity;
+        outParams->minEnemiesPerRoom = pcgParams.minEnemiesPerRoom;
+        outParams->maxEnemiesPerRoom = pcgParams.maxEnemiesPerRoom;
     }
 }
 
 DDA_API float DDA_GetDifficultyMultiplier() {
-    return DDAEngine::getInstance().getCurrentParameters().difficultyMultiplier;
+    auto params = DDAEngine::getInstance().getCurrentParameters();
+    return params.getValue<float>("Global.difficultyMultiplier", 1.0f);
 }
 
 DDA_API void DDA_SetMode(DDAMode mode) {
