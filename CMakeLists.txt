@@ -55,7 +55,26 @@ target_include_directories(DDAEngineTest
 # Define export macro for test executable too since it compiles the sources directly
 target_compile_definitions(DDAEngineTest PRIVATE DDA_ENGINE_EXPORTS)
 
-# Link ALL_LIBS if needed later (won’t fail if not linked)
+# === Configurable DDA Example ===
+if(EXISTS "${CMAKE_SOURCE_DIR}/examples/configurable_dda_example.cpp")
+    add_executable(ConfigurableDDAExample
+        ${SOURCE_FILES}
+        "${CMAKE_SOURCE_DIR}/examples/configurable_dda_example.cpp"
+    )
+    
+    target_include_directories(ConfigurableDDAExample
+        PRIVATE "${CMAKE_SOURCE_DIR}/src"
+        PRIVATE "${CMAKE_SOURCE_DIR}/includes"
+    )
+    
+    target_compile_definitions(ConfigurableDDAExample PRIVATE DDA_ENGINE_EXPORTS)
+    
+    target_link_libraries(ConfigurableDDAExample
+        ${ALL_LIBS}
+    )
+endif()
+
+# Link ALL_LIBS if needed later (won't fail if not linked)
 target_link_libraries(DDAEngine
     ${ALL_LIBS}
 )

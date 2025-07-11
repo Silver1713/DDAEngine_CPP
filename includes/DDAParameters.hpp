@@ -3,7 +3,9 @@
 #include <vector>
 #include <string>
 #include <nlohmann/json.hpp>
+#include "ParameterConfig.hpp"
 
+// Legacy structures for backward compatibility
 struct AIParameters {
     float aggressiveness = 0.5f;      
     float reactionTime = 1.0f;        
@@ -65,86 +67,77 @@ struct PCGParameters {
     }
 };
 
-struct DDAParameters {
-    AIParameters ai;
-    PCGParameters pcg;
-    float difficultyMultiplier = 1.0f; 
+// New configurable DDA parameters class
+class DDAParameters {
+private:
+    ParameterValues parameters;
+    const ParameterConfig* config;
     std::string profileName = "default";
     
-    std::vector<float> toGeneticVector() const {
-        return {
-            ai.aggressiveness,
-            ai.reactionTime,
-            ai.accuracy,
-            ai.movementSpeed,
-            ai.detectionRange,
-            ai.attackFrequency,
-            pcg.enemyDensity,
-            pcg.powerUpFrequency,
-            pcg.obstacleComplexity,
-            pcg.pathBranching,
-            pcg.hazardIntensity,
-            static_cast<float>(pcg.minEnemiesPerRoom) / 10.0f,
-            static_cast<float>(pcg.maxEnemiesPerRoom) / 10.0f,
-            difficultyMultiplier
-        };
+public:
+    // Constructors
+    DDAParameters();
+    explicit DDAParameters(const ParameterConfig* configuration);
+    DDAParameters(const ParameterConfig* configuration, const std::string& profile);
+    
+    // Configuration management
+    void setConfig(const ParameterConfig* configuration);
+    const ParameterConfig* getConfig() const { return config; }
+    
+    // Parameter access
+    template<typename T>
+    T getValue(const std::string& key, const T& defaultValue = T{}) const {
+        return parameters.getValue<T>(key, defaultValue);
     }
     
-    void fromGeneticVector(const std::vector<float>& genes) {
-        if (genes.size() >= 14) {
-            ai.aggressiveness = genes[0];
-            ai.reactionTime = genes[1];
-            ai.accuracy = genes[2];
-            ai.movementSpeed = genes[3];
-            ai.detectionRange = genes[4];
-            ai.attackFrequency = genes[5];
-            pcg.enemyDensity = genes[6];
-            pcg.powerUpFrequency = genes[7];
-            pcg.obstacleComplexity = genes[8];
-            pcg.pathBranching = genes[9];
-            pcg.hazardIntensity = genes[10];
-            pcg.minEnemiesPerRoom = static_cast<int>(genes[11] * 10.0f);
-            pcg.maxEnemiesPerRoom = static_cast<int>(genes[12] * 10.0f);
-            difficultyMultiplier = genes[13];
-        }
-    }
+    void setValue(const std::string& key, const ParameterValue& value);
+    bool hasValue(const std::string& key) const;
     
-    nlohmann::json toJson() const {
-        return nlohmann::json{
-            {"ai", ai.toJson()},
-            {"pcg", pcg.toJson()},
-            {"difficultyMultiplier", difficultyMultiplier},
-            {"profileName", profileName}
-        };
-    }
+    // Bulk operations
+    void setParameters(const ParameterValues& params);
+    const ParameterValues& getParameters() const { return parameters; }
+    ParameterValues& getParameters() { return parameters; }
     
-    void fromJson(const nlohmann::json& j) {
-        if (j.contains("ai")) ai.fromJson(j["ai"]);
-        if (j.contains("pcg")) pcg.fromJson(j["pcg"]);
-        difficultyMultiplier = j.value("difficultyMultiplier", difficultyMultiplier);
-        profileName = j.value("profileName", profileName);
-    }
+    // Legacy compatibility - AI parameters
+    AIParameters getAIParameters() const;
+    void setAIParameters(const AIParameters& ai);
     
-    void clamp() {
-        auto clampValue = [](float& value, float min, float max) {
-            value = std::max(min, std::min(max, value));
-        };
-        
-        clampValue(ai.aggressiveness, 0.0f, 1.0f);
-        clampValue(ai.reactionTime, 0.1f, 3.0f);
-        clampValue(ai.accuracy, 0.0f, 1.0f);
-        clampValue(ai.movementSpeed, 0.1f, 3.0f);
-        clampValue(ai.detectionRange, 1.0f, 50.0f);
-        clampValue(ai.attackFrequency, 0.0f, 1.0f);
-        
-        clampValue(pcg.enemyDensity, 0.0f, 1.0f);
-        clampValue(pcg.powerUpFrequency, 0.0f, 1.0f);
-        clampValue(pcg.obstacleComplexity, 0.0f, 1.0f);
-        clampValue(pcg.pathBranching, 0.0f, 1.0f);
-        clampValue(pcg.hazardIntensity, 0.0f, 1.0f);
-        pcg.minEnemiesPerRoom = std::max(0, std::min(10, pcg.minEnemiesPerRoom));
-        pcg.maxEnemiesPerRoom = std::max(pcg.minEnemiesPerRoom, std::min(20, pcg.maxEnemiesPerRoom));
-        
-        clampValue(difficultyMultiplier, 0.1f, 3.0f);
-    }
+    // Legacy compatibility - PCG parameters  
+    PCGParameters getPCGParameters() const;
+    void setPCGParameters(const PCGParameters& pcg);
+    
+    // Genetic algorithm support
+    std::vector<float> toGeneticVector() const;
+    void fromGeneticVector(const std::vector<float>& genes);
+    
+    // JSON serialization
+    nlohmann::json toJson() const;
+    void fromJson(const nlohmann::json& j);
+    
+    // Validation and clamping
+    void clamp();
+    bool isValid() const;
+    
+    // Profile management
+    void setProfileName(const std::string& profile) { profileName = profile; }
+    const std::string& getProfileName() const { return profileName; }
+    
+    // Utility functions
+    void loadDefaults();
+    void resetToDefaults();
+    
+    // Get all parameters by group
+    std::unordered_map<std::string, ParameterValue> getParametersByGroup(const std::string& groupName) const;
+    void setParametersByGroup(const std::string& groupName, const std::unordered_map<std::string, ParameterValue>& groupParams);
+    
+    // Parameter interpolation for smooth transitions
+    static DDAParameters interpolate(const DDAParameters& from, const DDAParameters& to, float t);
+    
+    // Copy constructor and assignment for proper config handling
+    DDAParameters(const DDAParameters& other);
+    DDAParameters& operator=(const DDAParameters& other);
+    
+    // Comparison operators
+    bool operator==(const DDAParameters& other) const;
+    bool operator!=(const DDAParameters& other) const { return !(*this == other); }
 };

@@ -199,7 +199,7 @@ The framework implements a two-tier AI system:
 ```
 Enemy FSM States:
 ┌──────────┐     ┌──────────┐     ┌──────────┐
-│   Idle   │────►│   Walk   │────►│  Attack  │
+│   Idle   │────►│  Walk    │────►│  Attack  │
 └──────────┘     └──────────┘     └──────────┘
       │                │                 │
       ▼                ▼                 ▼

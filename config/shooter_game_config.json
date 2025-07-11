@@ -1,0 +1,220 @@
+{
+  "parameterGroups": [
+    {
+      "name": "AI",
+      "description": "AI behavior parameters for shooter game",
+      "parameters": [
+        {
+          "name": "aggressiveness",
+          "type": "float",
+          "defaultValue": 0.6,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "How aggressive the AI is in combat"
+        },
+        {
+          "name": "reactionTime",
+          "type": "float",
+          "defaultValue": 0.8,
+          "minValue": 0.1,
+          "maxValue": 2.5,
+          "description": "AI reaction time in seconds"
+        },
+        {
+          "name": "accuracy",
+          "type": "float",
+          "defaultValue": 0.75,
+          "minValue": 0.1,
+          "maxValue": 0.95,
+          "description": "AI shooting accuracy"
+        },
+        {
+          "name": "movementSpeed",
+          "type": "float",
+          "defaultValue": 1.2,
+          "minValue": 0.5,
+          "maxValue": 2.0,
+          "description": "AI movement speed multiplier"
+        },
+        {
+          "name": "detectionRange",
+          "type": "float",
+          "defaultValue": 15.0,
+          "minValue": 5.0,
+          "maxValue": 30.0,
+          "description": "AI detection range in meters"
+        },
+        {
+          "name": "attackFrequency",
+          "type": "float",
+          "defaultValue": 0.7,
+          "minValue": 0.2,
+          "maxValue": 1.0,
+          "description": "How often AI attacks per second"
+        },
+        {
+          "name": "flanking",
+          "type": "float",
+          "defaultValue": 0.4,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Tendency to flank the player"
+        },
+        {
+          "name": "cooperation",
+          "type": "float",
+          "defaultValue": 0.6,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Level of AI cooperation with other units"
+        }
+      ]
+    },
+    {
+      "name": "Combat",
+      "description": "Combat-specific parameters",
+      "parameters": [
+        {
+          "name": "damageMultiplier",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.5,
+          "maxValue": 2.0,
+          "description": "Damage dealt by AI"
+        },
+        {
+          "name": "healthMultiplier",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.5,
+          "maxValue": 3.0,
+          "description": "AI health multiplier"
+        },
+        {
+          "name": "weaponVariety",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Variety of weapons used by AI"
+        },
+        {
+          "name": "useGrenades",
+          "type": "bool",
+          "defaultValue": true,
+          "minValue": false,
+          "maxValue": true,
+          "description": "Whether AI uses grenades"
+        }
+      ]
+    },
+    {
+      "name": "PCG",
+      "description": "Level generation parameters",
+      "parameters": [
+        {
+          "name": "enemyDensity",
+          "type": "float",
+          "defaultValue": 0.6,
+          "minValue": 0.2,
+          "maxValue": 1.0,
+          "description": "Density of enemies in levels"
+        },
+        {
+          "name": "coverDensity",
+          "type": "float",
+          "defaultValue": 0.4,
+          "minValue": 0.1,
+          "maxValue": 0.8,
+          "description": "Amount of cover available"
+        },
+        {
+          "name": "ammoFrequency",
+          "type": "float",
+          "defaultValue": 0.3,
+          "minValue": 0.1,
+          "maxValue": 0.7,
+          "description": "Frequency of ammo pickups"
+        },
+        {
+          "name": "healthPackFrequency",
+          "type": "float",
+          "defaultValue": 0.25,
+          "minValue": 0.05,
+          "maxValue": 0.5,
+          "description": "Frequency of health packs"
+        },
+        {
+          "name": "levelComplexity",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.2,
+          "maxValue": 0.9,
+          "description": "Complexity of level layout"
+        },
+        {
+          "name": "ambushPoints",
+          "type": "int",
+          "defaultValue": 3,
+          "minValue": 0,
+          "maxValue": 8,
+          "description": "Number of potential ambush points"
+        },
+        {
+          "name": "sniperPositions",
+          "type": "int",
+          "defaultValue": 2,
+          "minValue": 0,
+          "maxValue": 5,
+          "description": "Number of sniper positions"
+        }
+      ]
+    }
+  ],
+  "fitnessConfig": {
+    "baseFitness": 100.0,
+    "aggregationMethod": "weighted_sum",
+    "metrics": [
+      {
+        "metricName": "player_deaths",
+        "weight": 35.0,
+        "idealValue": 0.15,
+        "minValue": 0.0,
+        "maxValue": 3.0,
+        "evaluationType": "distance"
+      },
+      {
+        "metricName": "completion_time",
+        "weight": 25.0,
+        "idealValue": 240.0,
+        "minValue": 60.0,
+        "maxValue": 480.0,
+        "evaluationType": "distance"
+      },
+      {
+        "metricName": "accuracy",
+        "weight": 20.0,
+        "idealValue": 0.75,
+        "minValue": 0.3,
+        "maxValue": 0.95,
+        "evaluationType": "distance"
+      },
+      {
+        "metricName": "enemies_killed",
+        "weight": 10.0,
+        "idealValue": 25.0,
+        "minValue": 5.0,
+        "maxValue": 60.0,
+        "evaluationType": "maximize"
+      },
+      {
+        "metricName": "damage_taken",
+        "weight": 10.0,
+        "idealValue": 40.0,
+        "minValue": 0.0,
+        "maxValue": 200.0,
+        "evaluationType": "minimize"
+      }
+    ]
+  }
+}

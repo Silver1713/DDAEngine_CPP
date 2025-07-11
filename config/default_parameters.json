@@ -1,0 +1,266 @@
+{
+  "parameterGroups": [
+    {
+      "name": "AI",
+      "description": "AI behavior parameters",
+      "parameters": [
+        {
+          "name": "aggressiveness",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "How aggressive the AI is (0.0 = passive, 1.0 = very aggressive)"
+        },
+        {
+          "name": "reactionTime",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.1,
+          "maxValue": 3.0,
+          "description": "AI reaction time in seconds"
+        },
+        {
+          "name": "accuracy",
+          "type": "float",
+          "defaultValue": 0.7,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "AI shooting accuracy (0.0 = never hits, 1.0 = always hits)"
+        },
+        {
+          "name": "movementSpeed",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.1,
+          "maxValue": 3.0,
+          "description": "AI movement speed multiplier"
+        },
+        {
+          "name": "detectionRange",
+          "type": "float",
+          "defaultValue": 10.0,
+          "minValue": 1.0,
+          "maxValue": 50.0,
+          "description": "AI detection range in game units"
+        },
+        {
+          "name": "attackFrequency",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "How often AI attacks (attacks per second)"
+        },
+        {
+          "name": "patrolSpeed",
+          "type": "float",
+          "defaultValue": 0.8,
+          "minValue": 0.1,
+          "maxValue": 2.0,
+          "description": "Speed when patrolling (multiplier of base speed)"
+        },
+        {
+          "name": "alertLevel",
+          "type": "float",
+          "defaultValue": 0.3,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Base alertness level of AI"
+        }
+      ]
+    },
+    {
+      "name": "PCG",
+      "description": "Procedural content generation parameters",
+      "parameters": [
+        {
+          "name": "enemyDensity",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Density of enemies in levels"
+        },
+        {
+          "name": "powerUpFrequency",
+          "type": "float",
+          "defaultValue": 0.3,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Frequency of power-ups spawning"
+        },
+        {
+          "name": "obstacleComplexity",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Complexity of obstacles and level geometry"
+        },
+        {
+          "name": "pathBranching",
+          "type": "float",
+          "defaultValue": 0.4,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Level path branching factor (0.0 = linear, 1.0 = highly branched)"
+        },
+        {
+          "name": "hazardIntensity",
+          "type": "float",
+          "defaultValue": 0.3,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Intensity of environmental hazards"
+        },
+        {
+          "name": "minEnemiesPerRoom",
+          "type": "int",
+          "defaultValue": 1,
+          "minValue": 0,
+          "maxValue": 10,
+          "description": "Minimum number of enemies per room"
+        },
+        {
+          "name": "maxEnemiesPerRoom",
+          "type": "int",
+          "defaultValue": 5,
+          "minValue": 1,
+          "maxValue": 20,
+          "description": "Maximum number of enemies per room"
+        },
+        {
+          "name": "roomSize",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.5,
+          "maxValue": 2.0,
+          "description": "Room size multiplier"
+        },
+        {
+          "name": "lootRarity",
+          "type": "float",
+          "defaultValue": 0.2,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Rarity of special loot items"
+        }
+      ]
+    },
+    {
+      "name": "Environment",
+      "description": "Environmental and atmospheric parameters",
+      "parameters": [
+        {
+          "name": "lightingIntensity",
+          "type": "float",
+          "defaultValue": 0.7,
+          "minValue": 0.1,
+          "maxValue": 1.0,
+          "description": "Overall lighting intensity"
+        },
+        {
+          "name": "ambientSoundVolume",
+          "type": "float",
+          "defaultValue": 0.5,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Volume of ambient sounds"
+        },
+        {
+          "name": "weatherIntensity",
+          "type": "float",
+          "defaultValue": 0.3,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Intensity of weather effects"
+        },
+        {
+          "name": "fogDensity",
+          "type": "float",
+          "defaultValue": 0.2,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Density of fog effects"
+        }
+      ]
+    },
+    {
+      "name": "Economy",
+      "description": "Game economy and progression parameters",
+      "parameters": [
+        {
+          "name": "experienceMultiplier",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.5,
+          "maxValue": 3.0,
+          "description": "Experience gain multiplier"
+        },
+        {
+          "name": "currencyDropRate",
+          "type": "float",
+          "defaultValue": 0.4,
+          "minValue": 0.0,
+          "maxValue": 1.0,
+          "description": "Rate at which currency drops from enemies"
+        },
+        {
+          "name": "upgradeCostMultiplier",
+          "type": "float",
+          "defaultValue": 1.0,
+          "minValue": 0.1,
+          "maxValue": 5.0,
+          "description": "Multiplier for upgrade costs"
+        }
+      ]
+    }
+  ],
+  "fitnessConfig": {
+    "baseFitness": 100.0,
+    "aggregationMethod": "weighted_sum",
+    "metrics": [
+      {
+        "metricName": "player_deaths",
+        "weight": 30.0,
+        "idealValue": 0.2,
+        "minValue": 0.0,
+        "maxValue": 5.0,
+        "evaluationType": "distance"
+      },
+      {
+        "metricName": "completion_time",
+        "weight": 25.0,
+        "idealValue": 300.0,
+        "minValue": 60.0,
+        "maxValue": 600.0,
+        "evaluationType": "distance"
+      },
+      {
+        "metricName": "accuracy",
+        "weight": 20.0,
+        "idealValue": 0.7,
+        "minValue": 0.0,
+        "maxValue": 1.0,
+        "evaluationType": "distance"
+      },
+      {
+        "metricName": "enemies_killed",
+        "weight": 15.0,
+        "idealValue": 20.0,
+        "minValue": 0.0,
+        "maxValue": 100.0,
+        "evaluationType": "maximize"
+      },
+      {
+        "metricName": "damage_taken",
+        "weight": 10.0,
+        "idealValue": 50.0,
+        "minValue": 0.0,
+        "maxValue": 500.0,
+        "evaluationType": "minimize"
+      }
+    ]
+  }
+}

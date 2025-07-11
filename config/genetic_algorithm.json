@@ -1,0 +1,11 @@
+{
+  "populationSize": 50,
+  "eliteSize": 5,
+  "mutationRate": 0.15,
+  "crossoverRate": 0.8,
+  "mutationStrength": 0.2,
+  "tournamentSize": 3,
+  "selectionMethod": "tournament",
+  "crossoverMethod": "uniform",
+  "mutationMethod": "gaussian"
+}
