@@ -12,7 +12,7 @@ void demonstrateConfigurableSystem() {
     // 1. Load parameter configuration from JSON
     std::cout << "\n1. Loading parameter configuration..." << std::endl;
     ParameterConfig paramConfig;
-    if (paramConfig.loadFromFile("config/shooter_game_config.json")) {
+    if (paramConfig.loadFromFile("../config/shooter_game_config.json")) {
         std::cout << "✓ Parameter configuration loaded successfully!" << std::endl;
         std::cout << "Found " << paramConfig.getParameterGroups().size() << " parameter groups" << std::endl;
     } else {

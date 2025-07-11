@@ -5,7 +5,7 @@
       "description": "AI behavior parameters for shooter game",
       "parameters": [
         {
-          "name": "aggressiveness",
+          "name": "BlahBlahBlah",
           "type": "float",
           "defaultValue": 0.6,
           "minValue": 0.0,
