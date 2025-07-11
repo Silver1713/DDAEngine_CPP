@@ -157,35 +157,35 @@ nlohmann::json getLevelGenerationHints() const {
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Unity/C# Game Layer                       │
+│                    Unity/C# Game Layer                      │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌─────────────────┐      ┌────────────────────┐           │
-│  │ DungeonManager  │      │  DDAEngineWrapper  │           │
-│  │   (Singleton)   │◄─────┤    (Singleton)     │           │
-│  │ • Grid System   │      │ • Metric Collection │           │
-│  │ • Room Loading  │      │ • Parameter Fetch   │           │
-│  └────────┬────────┘      └──────────┬─────────┘           │
-│           │                           │                      │
-│           ▼                           ▼                      │
+│                                                             │
+│  ┌─────────────────┐      ┌────────────────────┐            │
+│  │ DungeonManager  │      │  DDAEngineWrapper  │            │
+│  │   (Singleton)   │◄─────┤    (Singleton)     │            │
+│  │ • Grid System   │      │ • Metric Collection│            │
+│  │ • Room Loading  │      │ • Parameter Fetch  │            │
+│  └────────┬────────┘      └──────────┬─────────┘            │
+│           │                           │                     │
+│           ▼                           ▼                     │
 │  ┌─────────────────┐            P/Invoke API                │
 │  │  RoomManager    │                 │                      │
 │  │ • PCG Generation│                 ▼                      │
-│  │ • Enemy Spawning│      ┌──────────────────────┐         │
-│  │ • Tile Placement│      │  DDAEngineAPI (C)    │         │
-│  └────────┬────────┘      │ • Type Marshalling   │         │
-│           │               │ • Memory Management   │         │
-│           ▼               └──────────┬───────────┘         │
-│  ┌─────────────────────────┐         │                     │
-│  │    AI State Machines    │         ▼                     │
-│  ├─────────────────────────┤  ┌──────────────────┐        │
-│  │ PlayerStateManager      │  │ DDAEngine Core    │        │
-│  │ • Idle/Walk/Attack      │  │    (C++)          │        │
-│  │                         │  │                   │        │
-│  │ EnemyStateManager       │  │ • Genetic Algo    │        │
-│  │ • Idle/Walk/Attack/Die  │  │ • Metrics System  │        │
-│  └─────────────────────────┘  │ • Parameter Mgmt  │        │
-│                                └───────────────────┘        │
+│  │ • Enemy Spawning│      ┌──────────────────────┐          │
+│  │ • Tile Placement│      │  DDAEngineAPI (C)    │          │
+│  └────────┬────────┘      │ • Type Marshalling   │          │
+│           │               │ • Memory Management  │          │
+│           ▼               └──────────┬───────────┘          │
+│  ┌─────────────────────────┐         │                      │
+│  │    AI State Machines    │         ▼                      │
+│  ├─────────────────────────┤  ┌───────────────────┐         │
+│  │ PlayerStateManager      │  │ DDAEngine Core    │         │
+│  │ • Idle/Walk/Attack      │  │    (C++)          │         │
+│  │                         │  │                   │         │
+│  │ EnemyStateManager       │  │ • Genetic Algo    │         │
+│  │ • Idle/Walk/Attack/Die  │  │ • Metrics System  │         │
+│  └─────────────────────────┘  │ • Parameter Mgmt  │         │
+│                               └───────────────────┘         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
