@@ -9,6 +9,8 @@
 #include "GeneticAlgorithm.hpp"
 #include "DDAParameters.hpp"
 #include "DDAEngineAPI.h"
+#include "ConfigurableFitness.hpp"
+#include "ParameterConfig.hpp"
 
 // Use the DDAMode from DDAEngineAPI.h to avoid redefinition
 
@@ -16,7 +18,8 @@ class DDAEngine {
 private:
     static std::unique_ptr<DDAEngine> instance;
 
-    ParameterConfig configuration;
+    std::unique_ptr<ParameterConfig> configuration;
+    std::unique_ptr<ConfigurableFitness> fitnessEvaluator;
     
     MetricManager& metricManager;
     GeneticAlgorithm geneticAlgorithm;
@@ -25,12 +28,14 @@ private:
     
     DDAMode mode = DDA_MODE_ADAPTIVE;
     bool isEvolutionEnabled = true;
+    bool isInitialized = false;
     
     std::vector<std::pair<std::string, float>> playerPerformanceHistory;
     
     std::chrono::steady_clock::time_point lastEvolutionTime;
     std::chrono::minutes evolutionInterval{5};
     
+    // Legacy support
     float idealCompletionTime = 300.0f;  
     float idealDeathRate = 0.2f;        
     float idealAccuracy = 0.7f;         
@@ -40,7 +45,24 @@ private:
 public:
     static DDAEngine& getInstance();
     
+    // Configuration-based initialization
     void initialize();
+    void initialize(std::unique_ptr<ParameterConfig> config);
+    void initialize(std::unique_ptr<ParameterConfig> config, std::unique_ptr<ConfigurableFitness> fitness);
+    
+    // Configuration management
+    void loadConfiguration(const std::string& configPath);
+    void setConfiguration(std::unique_ptr<ParameterConfig> config);
+    ParameterConfig* getConfiguration() { return configuration.get(); }
+    const ParameterConfig* getConfiguration() const { return configuration.get(); }
+    
+    // Fitness management
+    void setFitnessEvaluator(std::unique_ptr<ConfigurableFitness> fitness);
+    ConfigurableFitness* getFitnessEvaluator() { return fitnessEvaluator.get(); }
+    
+    // Genetic algorithm configuration
+    void setGAConfig(const GAConfig& config);
+    GeneticAlgorithm& getGeneticAlgorithm() { return geneticAlgorithm; }
     
     void collectLevelMetrics(const std::string& metricMatrix);
     
@@ -70,9 +92,13 @@ public:
     void resetToDefaults();
     
 private:
+    // Legacy fitness calculation for backward compatibility
     float calculateFitness(const DDAParameters& params, const MetricManager& metrics);
     
     void smoothParameterTransition(float deltaTime);
     
     float normalizeMetric(float value, float min, float max, float ideal) const;
+    
+    // Helper to ensure configuration exists
+    void ensureConfiguration();
 };

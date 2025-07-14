@@ -26,21 +26,94 @@ DDAEngine& DDAEngine::getInstance() {
 }
 
 void DDAEngine::initialize() {
-    geneticAlgorithm.setFitnessFunction(
-        [this](const DDAParameters& params, const MetricManager& metrics) {
-            return calculateFitness(params, metrics);
-        }
-    );
-
-    geneticAlgorithm.initializePopulation(currentParameters);
+    // Default initialization - creates default configuration if none exists
+    ensureConfiguration();
     
-    metricManager.addMetric("player_deaths", DDAMetricType::COUNT);
-    metricManager.addMetric("completion_time", DDAMetricType::AVERAGE);
-    metricManager.addMetric("accuracy", DDAMetricType::AVERAGE);
-    metricManager.addMetric("enemies_killed", DDAMetricType::COUNT);
-    metricManager.addMetric("damage_taken", DDAMetricType::SUM);
-    metricManager.addMetric("powerups_collected", DDAMetricType::COUNT);
-    metricManager.addMetric("distance_traveled", DDAMetricType::SUM);
+    // Set up genetic algorithm with configuration
+    if (configuration) {
+        geneticAlgorithm.setParameterConfig(configuration.get());
+        currentParameters.setConfig(configuration.get());
+        targetParameters.setConfig(configuration.get());
+        
+        // Load defaults from configuration
+        currentParameters.loadDefaults();
+        targetParameters.loadDefaults();
+    }
+    
+    // If we have a fitness evaluator, use it; otherwise use legacy fitness
+    if (fitnessEvaluator) {
+        geneticAlgorithm.setFitnessEvaluator(std::make_unique<ConfigurableFitness>(*fitnessEvaluator));
+    } else {
+        // Legacy fitness function support
+        geneticAlgorithm.setFitnessFunction(
+            [this](const DDAParameters& params, const MetricManager& metrics) {
+                return calculateFitness(params, metrics);
+            }
+        );
+        
+        // Add default metrics for legacy mode
+        metricManager.addMetric("player_deaths", DDAMetricType::COUNT);
+        metricManager.addMetric("completion_time", DDAMetricType::AVERAGE);
+        metricManager.addMetric("accuracy", DDAMetricType::AVERAGE);
+        metricManager.addMetric("enemies_killed", DDAMetricType::COUNT);
+        metricManager.addMetric("damage_taken", DDAMetricType::SUM);
+        metricManager.addMetric("powerups_collected", DDAMetricType::COUNT);
+        metricManager.addMetric("distance_traveled", DDAMetricType::SUM);
+    }
+    
+    geneticAlgorithm.initializePopulation(currentParameters);
+    isInitialized = true;
+}
+
+void DDAEngine::initialize(std::unique_ptr<ParameterConfig> config) {
+    setConfiguration(std::move(config));
+    initialize();
+}
+
+void DDAEngine::initialize(std::unique_ptr<ParameterConfig> config, std::unique_ptr<ConfigurableFitness> fitness) {
+    setConfiguration(std::move(config));
+    setFitnessEvaluator(std::move(fitness));
+    initialize();
+}
+
+void DDAEngine::ensureConfiguration() {
+    if (!configuration) {
+        configuration = std::make_unique<ParameterConfig>(ParameterConfig::createDefaultConfig());
+    }
+}
+
+void DDAEngine::loadConfiguration(const std::string& configPath) {
+    auto config = std::make_unique<ParameterConfig>();
+    if (config->loadFromFile(configPath)) {
+        setConfiguration(std::move(config));
+    } else {
+        std::cerr << "Failed to load configuration from: " << configPath << std::endl;
+    }
+}
+
+void DDAEngine::setConfiguration(std::unique_ptr<ParameterConfig> config) {
+    configuration = std::move(config);
+    if (configuration) {
+        currentParameters.setConfig(configuration.get());
+        targetParameters.setConfig(configuration.get());
+        geneticAlgorithm.setParameterConfig(configuration.get());
+        
+        // If we have a fitness config, create evaluator
+        if (!fitnessEvaluator) {
+            fitnessEvaluator = std::make_unique<ConfigurableFitness>(configuration->getFitnessConfig());
+        }
+    }
+}
+
+void DDAEngine::setFitnessEvaluator(std::unique_ptr<ConfigurableFitness> fitness) {
+    fitnessEvaluator = std::move(fitness);
+    if (fitnessEvaluator && isInitialized) {
+        geneticAlgorithm.setFitnessEvaluator(std::make_unique<ConfigurableFitness>(*fitnessEvaluator));
+    }
+}
+
+void DDAEngine::setGAConfig(const GAConfig& config) {
+    geneticAlgorithm.setConfig(config);
 }
 
 void DDAEngine::collectLevelMetrics(const std::string& metricMatrix) {
@@ -303,17 +376,31 @@ void DDAEngine::importParametersFromJson(const std::string& json) {
     try {
         nlohmann::json input = nlohmann::json::parse(json);
         
-        if (input.contains("current_parameters")) {
-            currentParameters.fromJson(input["current_parameters"]);
-        }
-        if (input.contains("target_parameters")) {
-            targetParameters.fromJson(input["target_parameters"]);
-        }
-        if (input.contains("mode")) {
-            mode = static_cast<DDAMode>(input["mode"].get<int>());
-        }
-        if (input.contains("evolution_enabled")) {
-            isEvolutionEnabled = input["evolution_enabled"].get<bool>();
+        // Check if this is a full configuration or just parameters
+        if (input.contains("parameterGroups") || input.contains("fitnessConfig")) {
+            // This is a full configuration
+            auto config = std::make_unique<ParameterConfig>();
+            config->loadFromJson(input);
+            setConfiguration(std::move(config));
+            
+            // Initialize if not already done
+            if (!isInitialized) {
+                initialize();
+            }
+        } else {
+            // Legacy format - just parameters
+            if (input.contains("current_parameters")) {
+                currentParameters.fromJson(input["current_parameters"]);
+            }
+            if (input.contains("target_parameters")) {
+                targetParameters.fromJson(input["target_parameters"]);
+            }
+            if (input.contains("mode")) {
+                mode = static_cast<DDAMode>(input["mode"].get<int>());
+            }
+            if (input.contains("evolution_enabled")) {
+                isEvolutionEnabled = input["evolution_enabled"].get<bool>();
+            }
         }
     } catch (const std::exception& e) {
         std::cerr << "Failed to import parameters: " << e.what() << std::endl;
@@ -327,8 +414,15 @@ void DDAEngine::setIdealMetrics(float completionTime, float deathRate, float acc
 }
 
 void DDAEngine::resetToDefaults() {
-    currentParameters = DDAParameters();
-    targetParameters = DDAParameters();
+    if (configuration) {
+        currentParameters = DDAParameters(configuration.get());
+        targetParameters = DDAParameters(configuration.get());
+        currentParameters.loadDefaults();
+        targetParameters.loadDefaults();
+    } else {
+        currentParameters = DDAParameters();
+        targetParameters = DDAParameters();
+    }
     playerPerformanceHistory.clear();
     metricManager.clearAll();
     initialize();

@@ -64,16 +64,23 @@ extern "C" {
 			DDA_Load();
 		}
 		NATIVE_DEBUG("Load Param config\n");
-		ParameterConfig paramConfig;
-		if (paramConfig.loadFromFile("../config/shooter_game_config.json")) {
-			NATIVE_DEBUG("Parameter configuration loaded successfully!\n");
-			char message[2000];
-			snprintf(message, 2000, "Found %d parameter groups\n", paramConfig.getParameterGroups().size());
-			NATIVE_DEBUG(message);
-		}
-		else {
-			NATIVE_DEBUG("Loading params failed\n");
-			paramConfig = ParameterConfig::createDefaultConfig();
+		
+		// Load configuration from JSON string or file path
+		if (json && strlen(json) > 0) {
+			if (json[0] == '{') {
+				// It's a JSON string
+				DDAEngine::getInstance().importParametersFromJson(json);
+				NATIVE_DEBUG("Configuration loaded from JSON string\n");
+			} else {
+				// It's a file path
+				DDAEngine::getInstance().loadConfiguration(json);
+				NATIVE_DEBUG("Configuration loaded from file\n");
+			}
+		} else {
+			// Use default configuration
+			auto config = std::make_unique<ParameterConfig>(ParameterConfig::createDefaultConfig());
+			DDAEngine::getInstance().setConfiguration(std::move(config));
+			NATIVE_DEBUG("Using default configuration\n");
 		}
 		return 0;
 	}
