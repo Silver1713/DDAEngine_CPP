@@ -31,7 +31,7 @@ void DDAEngine::initialize() {
             return calculateFitness(params, metrics);
         }
     );
-    
+
     geneticAlgorithm.initializePopulation(currentParameters);
     
     metricManager.addMetric("player_deaths", DDAMetricType::COUNT);

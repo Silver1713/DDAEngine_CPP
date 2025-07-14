@@ -2,11 +2,39 @@
 #include <memory>
 #include "ParameterConfig.hpp"
 #include "ConfigurableFitness.hpp"
+#include "DDAEngine.hpp"
 #include "GeneticAlgorithm.hpp"
 #include "DDAParameters.hpp"
 #include "MetricManager.hpp"
+#include "DDAEngineAPI.h"
+
+#include <fstream>
+
+void default_pop()
+{
+	std::ifstream file("F:\\Unity Projects\\legend-unity\\DllImport\\DDAEngine\\config\\default_parameters.json");
+    if (!file.is_open()) {
+        std::cerr << "Failed to open default parameters file." << std::endl;
+        return;
+	}
+
+    
+
+    std::string data;
+
+    while (file) {
+        std::string line;
+        std::getline(file, line);
+        data += line + "\n";
+	}
+    file.close();
+    DDAEngine::getInstance().importParametersFromJson(data);
+    DDAEngine::getInstance().initialize();
+	std::cout << "Default parameters loaded and DDA Engine initialized." << std::endl;
+}
 
 void demonstrateConfigurableSystem() {
+    DDA_Load();
     std::cout << "=== Configurable DDA System Demonstration ===" << std::endl;
     
     // 1. Load parameter configuration from JSON
@@ -187,13 +215,16 @@ void demonstrateCustomGameConfigs() {
 int main() {
     try {
         demonstrateConfigurableSystem();
-        demonstrateParameterInterpolation();
-        demonstrateCustomGameConfigs();
+       // demonstrateParameterInterpolation();
+      //  demonstrateCustomGameConfigs();
         
         std::cout << "\n🎉 All demonstrations completed successfully!" << std::endl;
+        //default_pop();
         return 0;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+
+    
 }

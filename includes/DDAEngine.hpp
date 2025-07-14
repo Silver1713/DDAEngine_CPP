@@ -15,6 +15,8 @@
 class DDAEngine {
 private:
     static std::unique_ptr<DDAEngine> instance;
+
+    ParameterConfig configuration;
     
     MetricManager& metricManager;
     GeneticAlgorithm geneticAlgorithm;
