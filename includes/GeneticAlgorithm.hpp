@@ -11,6 +11,7 @@
 #include "ConfigurableFitness.hpp"
 
 struct Individual {
+    bool evaluated = false;
     std::vector<float> genes;
     float fitness = 0.0f;
     
@@ -43,7 +44,10 @@ struct GAConfig {
 class GeneticAlgorithm {
 private:
     GAConfig config;
-    std::vector<Individual> population;
+    size_t activeIndex = 0;
+    size_t totalEvaluated = 0;
+	std::vector<Individual> population;
+
     std::mt19937 rng;
     std::uniform_real_distribution<float> uniformDist;
     std::normal_distribution<float> normalDist;
@@ -102,7 +106,23 @@ public:
     // Debug and analysis
     std::string getEvolutionReport() const;
     std::vector<float> getFitnessHistory() const;
+
+
+    Individual& GetCurrent();
+    void SetActiveIndex(int index);
+	int GetActiveIndex() const { return activeIndex; }
+
     
+
+    bool AllEvaluated() const {
+        return totalEvaluated >= config.populationSize;
+	}
+
+    DDAParameters GetActiveIndividualParams();
+
+    void EvaluateFitnessIndividual(MetricManager& manager);
+
+    void getUnevaluated();
 private:
     // Core evolution operations
     void evaluateFitness(const MetricManager& metrics);

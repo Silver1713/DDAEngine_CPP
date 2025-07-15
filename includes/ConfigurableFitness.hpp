@@ -25,6 +25,7 @@ public:
     // Configuration management
     void setConfig(const FitnessConfig& fitnessConfig);
     const FitnessConfig& getConfig() const { return config; }
+	FitnessConfig& getConfig() { return config; }
     
     // Main fitness evaluation
     float evaluateFitness(const ParameterValues& parameters, const MetricManager& metrics) const;

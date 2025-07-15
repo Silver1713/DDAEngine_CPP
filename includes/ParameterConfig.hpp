@@ -43,13 +43,27 @@ struct ParameterGroup {
 
 // Fitness function configuration
 struct FitnessMetricConfig {
+
+    enum MetricType
+    {
+        SUM,
+        AVERAGE,
+        MINIMUM,
+        MAXIMUM,
+        COUNT,
+        UNIQUE_COUNT,
+        VARIANCE,
+        STD_DEV,
+    };
+
+
     std::string metricName;
     float weight = 1.0f;
     float idealValue = 0.0f;
     float minValue = 0.0f;
     float maxValue = 1.0f;
     std::string evaluationType = "distance"; // "distance", "target", "minimize", "maximize"
-    
+    MetricType type = MetricType::AVERAGE;
     nlohmann::json toJson() const;
     void fromJson(const nlohmann::json& j);
 };
@@ -91,6 +105,7 @@ public:
     
     // Fitness configuration
     const FitnessConfig& getFitnessConfig() const { return fitnessConfig; }
+	FitnessConfig& getFitnessConfig() { return fitnessConfig; }
     void setFitnessConfig(const FitnessConfig& config) { fitnessConfig = config; }
     
     // Validation

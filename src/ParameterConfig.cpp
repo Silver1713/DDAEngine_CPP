@@ -143,12 +143,27 @@ ParameterDefinition* ParameterGroup::getParameter(const std::string& name) {
 
 // FitnessMetricConfig implementation
 nlohmann::json FitnessMetricConfig::toJson() const {
+    std::string metricType = "average";
+    switch (type)
+    {
+	    
+       case SUM: metricType = "sum"; break;
+        case AVERAGE: metricType = "average"; break;
+        case MINIMUM: metricType = "minimum"; break;
+        case MAXIMUM: metricType = "maximum"; break;
+        case COUNT: metricType = "count"; break;
+        case UNIQUE_COUNT: metricType = "unique_count"; break;
+        case VARIANCE: metricType = "variance"; break;
+		case STD_DEV: metricType = "std_dev"; break;
+	}
+
     return nlohmann::json{
         {"metricName", metricName},
         {"weight", weight},
         {"idealValue", idealValue},
         {"minValue", minValue},
         {"maxValue", maxValue},
+		 {"type", metricType},
         {"evaluationType", evaluationType}
     };
 }
@@ -160,6 +175,25 @@ void FitnessMetricConfig::fromJson(const nlohmann::json& j) {
     minValue = j.value("minValue", 0.0f);
     maxValue = j.value("maxValue", 1.0f);
     evaluationType = j.value("evaluationType", "distance");
+	type = MetricType::AVERAGE;
+    std::string typeStr = j.value("type", "average");
+    if (typeStr == "sum") {
+        type = MetricType::SUM;
+    } else if (typeStr == "average") {
+        type = MetricType::AVERAGE;
+    } else if (typeStr == "minimum") {
+        type = MetricType::MINIMUM;
+    } else if (typeStr == "maximum") {
+        type = MetricType::MAXIMUM;
+    } else if (typeStr == "count") {
+        type = MetricType::COUNT;
+    } else if (typeStr == "unique_count") {
+        type = MetricType::UNIQUE_COUNT;
+    } else if (typeStr == "variance") {
+        type = MetricType::VARIANCE;
+    } else if (typeStr == "std_dev") {
+        type = MetricType::STD_DEV;
+	}
 }
 
 // FitnessConfig implementation
@@ -497,19 +531,25 @@ void ParameterValues::fromGeneticVector(const std::vector<float>& genes) {
             
             std::string key = group.name + "." + param.name;
             float normalizedValue = std::max(0.0f, std::min(1.0f, genes[geneIndex]));
-            
+            std::cout << "[fromGeneticVector] Set " << key << " = ";
             if (param.type == "float") {
                 float minVal = std::get<float>(param.minValue);
                 float maxVal = std::get<float>(param.maxValue);
                 float actualValue = minVal + normalizedValue * (maxVal - minVal);
                 setValue(key, actualValue);
+                std::cout << actualValue << std::endl;
+
             } else if (param.type == "int") {
                 int minVal = std::get<int>(param.minValue);
                 int maxVal = std::get<int>(param.maxValue);
                 int actualValue = minVal + static_cast<int>(normalizedValue * (maxVal - minVal));
                 setValue(key, actualValue);
+                std::cout << actualValue << std::endl;
+
             } else if (param.type == "bool") {
                 setValue(key, normalizedValue > 0.5f);
+                std::cout  << (normalizedValue > 0.5f) << std::endl;
+
             }
             
             geneIndex++;

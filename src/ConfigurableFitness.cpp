@@ -80,6 +80,7 @@ float ConfigurableFitness::evaluateFitness(const ParameterValues& parameters, co
         if (!metricValue) {
             continue; // Skip unavailable metrics
         }
+		std::cout << "Evaluating metric: " << metricConfig.metricName << std::endl;
         
         float value = 0.0f;
         if (std::holds_alternative<int>(*metricValue)) {
@@ -87,13 +88,17 @@ float ConfigurableFitness::evaluateFitness(const ParameterValues& parameters, co
         } else if (std::holds_alternative<double>(*metricValue)) {
             value = static_cast<float>(std::get<double>(*metricValue));
         }
-        
+
+        std::cout << "Value is " << value << '\n';
+
         // Handle special cases for derived metrics
         if (metricConfig.metricName == "player_deaths") {
             // Convert to death rate
             float levelCount = std::max(1.0f, static_cast<float>(metrics.getMetricCount("completion_time")));
             value = value / levelCount;
         }
+
+        std::cout << "Value is " << value << '\n';
         
         float metricScore = evaluateMetric(metricConfig.metricName, value);
         

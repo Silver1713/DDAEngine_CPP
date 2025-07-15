@@ -120,12 +120,14 @@ nlohmann::json DDAParameters::toJson() const {
     nlohmann::json j;
     j["profileName"] = profileName;
     j["parameters"] = parameters.toJson();
-    
+
+#ifdef USE_LEGACY
     // Include legacy format for compatibility
     j["legacy"] = nlohmann::json{
         {"ai", getAIParameters().toJson()},
         {"pcg", getPCGParameters().toJson()}
     };
+#endif
     
     return j;
 }
@@ -135,7 +137,9 @@ void DDAParameters::fromJson(const nlohmann::json& j) {
     
     if (j.contains("parameters")) {
         parameters.fromJson(j["parameters"]);
-    } else if (j.contains("legacy")) {
+    }
+#ifdef USE_LEGACY
+	else if (j.contains("legacy")) {
         // Load from legacy format
         if (j["legacy"].contains("ai")) {
             AIParameters ai;
@@ -148,6 +152,7 @@ void DDAParameters::fromJson(const nlohmann::json& j) {
             setPCGParameters(pcg);
         }
     }
+#endif
 }
 
 // Validation and clamping

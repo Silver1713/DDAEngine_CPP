@@ -63,6 +63,8 @@ public:
     // Genetic algorithm configuration
     void setGAConfig(const GAConfig& config);
     GeneticAlgorithm& getGeneticAlgorithm() { return geneticAlgorithm; }
+
+    
     
     void collectLevelMetrics(const std::string& metricMatrix);
     
@@ -90,6 +92,13 @@ public:
     nlohmann::json getLevelGenerationHints() const;
     
     void resetToDefaults();
+
+    void SetIdealMetricIndividual(const char* name, float idealValue);
+
+
+    void SelectNextCandidate();
+
+    
     
 private:
     // Legacy fitness calculation for backward compatibility

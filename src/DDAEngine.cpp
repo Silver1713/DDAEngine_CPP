@@ -27,11 +27,13 @@ DDAEngine& DDAEngine::getInstance() {
 
 void DDAEngine::initialize() {
     // Default initialization - creates default configuration if none exists
+    if (isInitialized) return;
     ensureConfiguration();
     
     // Set up genetic algorithm with configuration
     if (configuration) {
         geneticAlgorithm.setParameterConfig(configuration.get());
+        
         currentParameters.setConfig(configuration.get());
         targetParameters.setConfig(configuration.get());
         
@@ -43,6 +45,13 @@ void DDAEngine::initialize() {
     // If we have a fitness evaluator, use it; otherwise use legacy fitness
     if (fitnessEvaluator) {
         geneticAlgorithm.setFitnessEvaluator(std::make_unique<ConfigurableFitness>(*fitnessEvaluator));
+        const FitnessConfig& config = configuration->getFitnessConfig();
+        for (const auto& mc : config.metrics) {
+           
+            MetricManager::getInstance()->addMetric(
+                mc.metricName, static_cast<DDAMetricType>(mc.type)
+            );
+        }
     } else {
         // Legacy fitness function support
         geneticAlgorithm.setFitnessFunction(
@@ -50,7 +59,8 @@ void DDAEngine::initialize() {
                 return calculateFitness(params, metrics);
             }
         );
-        
+
+
         // Add default metrics for legacy mode
         metricManager.addMetric("player_deaths", DDAMetricType::COUNT);
         metricManager.addMetric("completion_time", DDAMetricType::AVERAGE);
@@ -63,6 +73,7 @@ void DDAEngine::initialize() {
     
     geneticAlgorithm.initializePopulation(currentParameters);
     isInitialized = true;
+    geneticAlgorithm.SetActiveIndex(0);
 }
 
 void DDAEngine::initialize(std::unique_ptr<ParameterConfig> config) {
@@ -157,9 +168,14 @@ void DDAEngine::collectLevelMetrics(const std::string& metricMatrix) {
 
 void DDAEngine::evolveParameters() {
     if (!isEvolutionEnabled || mode == DDA_MODE_FIXED) {
+		currentParameters = targetParameters;
         return;
     }
-    
+    if (!geneticAlgorithm.AllEvaluated())
+    {
+        std::cout << "Not all population is evaluated advance the next generation!";
+        return;
+    }
     auto now = std::chrono::steady_clock::now();
     auto timeSinceLastEvolution = std::chrono::duration_cast<std::chrono::minutes>(now - lastEvolutionTime);
     
@@ -411,6 +427,36 @@ void DDAEngine::setIdealMetrics(float completionTime, float deathRate, float acc
     idealCompletionTime = completionTime;
     idealDeathRate = deathRate;
     idealAccuracy = accuracy;
+}
+void DDAEngine::SetIdealMetricIndividual(char const* name, float idealValue) {
+
+    FitnessConfig& cfg = fitnessEvaluator->getConfig();
+    auto it =  std::find_if(cfg.metrics.begin(), cfg.metrics.end(),
+		[&name](const FitnessMetricConfig& metric) { return metric.metricName == name; });
+
+	if (it != cfg.metrics.end()) {
+        it->idealValue = idealValue;
+    }
+}
+void DDAEngine::SelectNextCandidate()
+{
+	// Evaluate the current candidate
+    getGeneticAlgorithm().EvaluateFitnessIndividual(metricManager);
+	int current = geneticAlgorithm.GetActiveIndex();
+
+    if (geneticAlgorithm.AllEvaluated()) {
+        evolveParameters();
+        
+    }
+    else
+    {
+        getGeneticAlgorithm().getUnevaluated();
+    }
+		
+
+   currentParameters =  getGeneticAlgorithm().GetActiveIndividualParams();
+
+    
 }
 
 void DDAEngine::resetToDefaults() {

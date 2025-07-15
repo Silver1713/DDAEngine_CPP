@@ -128,8 +128,12 @@ void GeneticAlgorithm::initializePopulation(const DDAParameters& baseParams) {
 }
 
 void GeneticAlgorithm::evolve(const MetricManager& metrics) {
-    evaluateFitness(metrics);
-    
+   // evaluateFitness(metrics);
+
+    if (!AllEvaluated())
+		throw "Not all individuals have been evaluated yet.";
+
+	
     // Sort population by fitness (descending)
     std::sort(population.begin(), population.end());
     
@@ -163,6 +167,11 @@ void GeneticAlgorithm::evolve(const MetricManager& metrics) {
         }
         
         newPopulation.push_back(child);
+
+
+        totalEvaluated--;
+
+        
     }
     
     population = std::move(newPopulation);
@@ -290,9 +299,71 @@ std::vector<float> GeneticAlgorithm::getFitnessHistory() const {
     return fitnessHistory;
 }
 
+Individual& GeneticAlgorithm::GetCurrent()
+{
+	if (population.size() > 0) {
+        return population[activeIndex];
+    }
+    else {
+        throw std::runtime_error("Population is empty, cannot get current individual.");
+	}
+}
+
+
+
+void GeneticAlgorithm::EvaluateFitnessIndividual(MetricManager& manager)
+{
+	Individual& individual = GetCurrent();
+    if (individual.evaluated)
+    {
+		std::cout << "Individual already evaluated." << std::endl;
+        return; // Already evaluated
+	}
+
+	evaluateFitness(manager);
+}
+
+
+void GeneticAlgorithm::getUnevaluated()
+{
+    if (AllEvaluated()) return;
+
+    auto it = std::find_if(population.begin(), population.end(), [](Individual const& individual)
+    {
+        return !individual.evaluated;
+    });
+
+    activeIndex = it - std::begin(population);
+}
+
+
+DDAParameters GeneticAlgorithm::GetActiveIndividualParams()
+{
+	Individual& individual = GetCurrent();
+	return createParametersFromIndividual(individual);
+}
+
+
+void GeneticAlgorithm::SetActiveIndex(int index)
+{
+    if (index >= 0 && index < population.size()) {
+        activeIndex = index;
+    }
+    else {
+        throw std::out_of_range("Invalid index");
+    }
+}
+
+
+
 // Private implementation methods
 void GeneticAlgorithm::evaluateFitness(const MetricManager& metrics) {
-    for (auto& individual : population) {
+   /* for (auto& individual : population) {*/
+    Individual& individual = population[activeIndex];
+        if (individual.evaluated)
+        {
+            return;
+        };
         DDAParameters params = createParametersFromIndividual(individual);
         
         if (fitnessEvaluator) {
@@ -302,7 +373,9 @@ void GeneticAlgorithm::evaluateFitness(const MetricManager& metrics) {
         } else {
             individual.fitness = 0.0f;
         }
-    }
+        totalEvaluated++;
+        individual.evaluated = true;
+    //}
 }
 
 std::vector<Individual> GeneticAlgorithm::selection() {

@@ -162,6 +162,13 @@ extern "C" {
 		DDAEngine::getInstance().setMode(static_cast<::DDAMode>(mode));
 	}
 
+	DDA_API void DDA_AdvanceEngine()
+	{
+		DDAEngine::getInstance().SelectNextCandidate(); // if all evaluated advance the next generation
+	}
+
+	
+
 	DDA_API DDAMode DDA_GetMode() {
 		return static_cast<DDAMode>(DDAEngine::getInstance().getMode());
 	}
@@ -210,6 +217,18 @@ extern "C" {
 
 	DDA_API float DDA_GetPlayerSkillLevel() {
 		return DDAEngine::getInstance().calculatePlayerSkillLevel();
+	}
+
+	DDA_API void DDA_SetAnyIdealMetric(const char* metricName, float idealValue) {
+		if (metricName)
+		{
+			DDAEngine::getInstance().SetIdealMetricIndividual(metricName, idealValue);
+
+		}
+		else
+		{
+			NATIVE_DEBUG("DDA_SetAnyIdealMetric: metricName is null\n");
+		}
 	}
 
 	DDA_API void DDA_SetIdealMetrics(float completionTime, float deathRate, float accuracy) {

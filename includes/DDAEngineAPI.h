@@ -68,6 +68,8 @@ extern "C" {
 
 	DDA_API void DDA_SetMode(DDAMode mode);
 
+	DDA_API void DDA_AdvanceEngine();
+
 	DDA_API DDAMode DDA_GetMode();
 
 	DDA_API void DDA_SetEvolutionEnabled(int enabled);
@@ -83,6 +85,9 @@ extern "C" {
 	DDA_API void DDA_ImportParametersJson(const char* json);
 
 	DDA_API float DDA_GetPlayerSkillLevel();
+
+
+	DDA_API void DDA_SetAnyIdealMetric(const char* metricName, float idealValue);
 
 	DDA_API void DDA_SetIdealMetrics(float completionTime, float deathRate, float accuracy);
 
