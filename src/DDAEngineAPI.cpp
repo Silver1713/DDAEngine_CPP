@@ -50,7 +50,7 @@ extern "C" {
 
 	DDA_API int DDA_Load()
 	{
-		AllocateConsole();
+		
 		instance = &DDAEngine::getInstance();
 		if (instance) return 0;
 		return 1;
