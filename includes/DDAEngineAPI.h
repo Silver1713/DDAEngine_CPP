@@ -56,7 +56,7 @@ extern "C" {
 
 	DDA_API void DDA_CollectMetricInt(const char* metricName, int value);
 
-	DDA_API void DDA_SubmitLevelMetrics(const char* jsonMetricMatrix);
+	DDA_API void	DDA_SubmitLevelMetrics(const char* jsonMetricMatrix);
 
 	DDA_API void DDA_EvolveParameters();
 

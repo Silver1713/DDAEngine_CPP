@@ -139,7 +139,7 @@ int main() {
 #include <iostream>
 #include <random>
 #include "DDAEngineAPI.h"
-
+#include <fstream>
 int main() {
     // 1) Load the DDA native plugin
     if (DDA_Load() != 0) {
@@ -202,7 +202,7 @@ int main() {
     std::uniform_real_distribution<float> realDist(0.0f, 1.0f);
     std::uniform_real_distribution<float> ratioDist(0.0f, 2.0f);
 
-    for (int session = 0; session <50 ; ++session) {
+    for (int session = 0; session <60 ; ++session) {
         std::cout << "--- Session " << session << " ---" << std::endl;
 
         // a) Push some damageratio metrics
@@ -226,10 +226,25 @@ int main() {
 
         // 7) Export and print the resulting state JSON
         const char* stateJson = DDA_ExportParametersJson();
-        std::cout << stateJson << std::endl;
-        DDA_FreeString(stateJson);
 
-        
+        static bool writed = false;
+        if (!writed)
+        {
+            std::ofstream outputFile("dda_state.json");
+            if (outputFile.is_open()) {
+                outputFile << stateJson;
+                outputFile.close();
+                std::cout << "State exported to dda_state.json" << std::endl;
+            }
+            else {
+                std::cerr << "Failed to open file for writing" << std::endl;
+            }
+            std::cout << stateJson << std::endl;
+            DDA_FreeString(stateJson);
+
+        }
+		writed = true;
+
     }
     // 8) Reset for next session
     DDA_Reset();

@@ -112,7 +112,9 @@ public:
     void SetActiveIndex(int index);
 	int GetActiveIndex() const { return activeIndex; }
 
-    
+    float GetActiveFitness() const { return population[activeIndex].fitness; }
+    float GetActiveFitness() {         return population[activeIndex].fitness;
+	}
 
     bool AllEvaluated() const {
         return totalEvaluated >= config.populationSize;

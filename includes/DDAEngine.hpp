@@ -63,6 +63,7 @@ public:
     // Genetic algorithm configuration
     void setGAConfig(const GAConfig& config);
     GeneticAlgorithm& getGeneticAlgorithm() { return geneticAlgorithm; }
+	const GeneticAlgorithm& getGeneticAlgorithm() const { return geneticAlgorithm; }
 
     
     

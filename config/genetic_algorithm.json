@@ -1,9 +1,9 @@
 {
-  "populationSize": 50,
+  "populationSize": 20,
   "eliteSize": 5,
-  "mutationRate": 0.15,
+  "mutationRate": 0.35,
   "crossoverRate": 0.8,
-  "mutationStrength": 0.2,
+  "mutationStrength": 0.55,
   "tournamentSize": 3,
   "selectionMethod": "tournament",
   "crossoverMethod": "uniform",

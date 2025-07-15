@@ -377,12 +377,13 @@ nlohmann::json DDAEngine::getLevelGenerationHints() const {
 
 std::string DDAEngine::exportParametersAsJson() const {
     nlohmann::json output;
+	GeneticAlgorithm const& ga = getGeneticAlgorithm();
     output["current_parameters"] = currentParameters.toJson();
     output["target_parameters"] = targetParameters.toJson();
     output["mode"] = static_cast<int>(mode);
     output["evolution_enabled"] = isEvolutionEnabled;
     output["player_skill_level"] = calculatePlayerSkillLevel();
-    output["fitness_score"] = geneticAlgorithm.getBestFitness();
+    output["fitness_score"] = ga.getBestFitness();
     output["generation_hints"] = getLevelGenerationHints();
     
     return output.dump(2);
@@ -456,6 +457,15 @@ void DDAEngine::SelectNextCandidate()
 
    currentParameters =  getGeneticAlgorithm().GetActiveIndividualParams();
 
+   metricManager.clearAll();
+
+   const FitnessConfig& config = configuration->getFitnessConfig();
+   for (const auto& mc : config.metrics) {
+
+       MetricManager::getInstance()->addMetric(
+           mc.metricName, static_cast<DDAMetricType>(mc.type)
+       );
+   }
     
 }
 
