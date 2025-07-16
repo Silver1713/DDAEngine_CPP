@@ -25,7 +25,7 @@ struct Individual {
 
 // Configuration for genetic algorithm parameters
 struct GAConfig {
-    size_t populationSize = 50;
+    size_t populationSize = 20;
     size_t eliteSize = 5;
     float mutationRate = 0.1f;
     float crossoverRate = 0.7f;
